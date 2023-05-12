@@ -7,11 +7,10 @@ import re
 
 
 IDMIN = 3000
-IDMAX = 10000
+IDMAX = 12000
 
 
 def getContent():
-    """Hàm này trả về 1 lời chúc ngẫu nhiên :)"""
     try:
         with open(r'data/contents.txt', 'r', encoding='utf-8') as r:
             datas = r.read().split("\n")
@@ -22,19 +21,16 @@ def getContent():
 
 
 def getAccount():
-    """Hàm này trả về tài khoản và mật khẩu từ file có định dạng username|password"""
     try:
         with open(r"data/account.txt", "r", encoding="utf-8") as f:
             account = f.read().split("|")
         f.close()
         return account[0], account[1]
     except:
-        # tài khoản mật khẩu mặc định nếu lỗi
         return "giangcute", "ahihi123"
    
 
 def getCookie():
-    """Hàm này trả về cookie nếu đăng nhập thành công ngược lại trả về None"""
     username, password = getAccount()
     response = requests.post(url="https://ngocrongsao.com/ajax/login",
                         data={
@@ -52,7 +48,6 @@ def getCookie():
    
 
 def getIdPost():
-    """Hàm này kiểm trả về id của bài viết có thể comment"""
     while True:
         idPost = randint(IDMIN, IDMAX)
         response = requests.get(f"https://ngocrongsao.com/bai-viet/{idPost}").text
@@ -61,8 +56,6 @@ def getIdPost():
 
 
 def buffComment():
-    """Hàm này dùng để buff comment các bài viết theo idPost"""
-
     global cookie
 
     idPost = getIdPost()
@@ -84,14 +77,12 @@ def buffComment():
         "x-requested-with": "XMLHttpRequest"
     }
 
-    payload = {
-        "topicId": f"{idPost}",
-        "content": content,
-    }
-
     response = requests.post(url="https://ngocrongsao.com/ajax/addcomment",
                         headers=headers,
-                        data=payload)
+                        data={
+                            "topicId": f"{idPost}",
+                            "content": content,
+                        })
     
     if len(response.text) == 0:
         print(f"Die cookie, tiến hành lấy lại cookie")
